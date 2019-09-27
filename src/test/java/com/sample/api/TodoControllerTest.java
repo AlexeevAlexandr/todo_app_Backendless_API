@@ -5,9 +5,7 @@ import com.sample.api.entity.TodoEntity;
 import com.sample.api.service.TodoService;
 import com.sample.api.testHelper.TestHelper;
 import org.json.simple.JSONObject;
-import org.junit.Before;
-import org.junit.FixMethodOrder;
-import org.junit.Test;
+import org.junit.*;
 import org.junit.runner.RunWith;
 import org.junit.runners.MethodSorters;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,6 +43,12 @@ public class TodoControllerTest {
     @Before
     public final void setup() {
         this.mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();
+    }
+
+    @AfterClass
+    public static void teardown(){
+        List<TodoEntity> todoEntities = TestHelper.getAll();
+        todoEntities.forEach(e -> TestHelper.delete(e.getObjectId()));
     }
 
     @Test
