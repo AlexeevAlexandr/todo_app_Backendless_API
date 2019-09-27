@@ -3,7 +3,6 @@ package com.sample.api;
 import com.sample.api.controller.TodoController;
 import com.sample.api.entity.TodoEntity;
 import com.sample.api.service.TodoService;
-import com.sample.api.service.TodoServiceImpl;
 import com.sample.api.testHelper.TestHelper;
 import org.json.simple.JSONObject;
 import org.junit.Before;
@@ -46,21 +45,6 @@ public class TodoControllerTest {
     @Before
     public final void setup() {
         this.mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();
-    }
-
-    public static void main(String[] args) {
-        TodoServiceImpl todoService = new TodoServiceImpl();
-        TodoEntity todoEntity = new TodoEntity();
-        todoEntity.setDeadlineDate("2020-12-31");
-        todoEntity.setDescription("here will be a description");
-        todoEntity.setOwner("Owner's Name");
-        System.out.println(todoService.save(todoEntity));
-
-        System.out.println(todoService.getAll().size());
-
-        TodoEntity todoEntity2 = todoService.getById("59DBBBF6-057D-4D82-FFC2-3A359F35D000");
-        todoEntity2.setDescription("rrrrrrrrr");
-        System.out.println(todoService.save(todoEntity2));
     }
 
     @Test
