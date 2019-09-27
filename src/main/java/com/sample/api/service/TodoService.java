@@ -13,4 +13,6 @@ public interface TodoService {
     List<TodoEntity> getAll();
 
     TodoEntity markAsCompleted(String id);
+
+    void deleteCompletedTodo();
 }

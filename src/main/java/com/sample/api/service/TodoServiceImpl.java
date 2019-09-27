@@ -53,4 +53,14 @@ public class TodoServiceImpl implements IBackendlessService, TodoService {
         todoEntity.setCompleted(true);
         return Backendless.Data.of(TodoEntity.class).save(todoEntity);
     }
+
+    @Override
+    public void deleteCompletedTodo() {
+        List<TodoEntity> entityList = getAll();
+        for (TodoEntity entity : entityList) {
+            if (entity.isCompleted()){
+                Backendless.Data.of(TodoEntity.class).remove(entity);
+            }
+        }
+    }
 }
