@@ -1,8 +1,8 @@
-**TODO_app**
+# **TODO_app**
 
 This program to create tasks (TODO), implemented as a REST service.
 
-Commands that can be executed (for example if you use localhost):
+**Commands that can be executed** (for example if you use localhost):
 
 method GET:
 
@@ -13,7 +13,7 @@ method POST:
 
     http://localhost:8080/todo - to create a new task, data is sent as a body;
     
-    The user must transfer the data in json format, for example:
+    the data must be in json format, for example:
     {
       "description":"here will be a description",
       "owner":"Owner's Name",
@@ -24,7 +24,7 @@ method PUT:
 
     http://localhost:8080/todo - to update a task, data is sent as a body;
     
-    The user must transfer the data in json format, for example:
+    the data must be in json format, for example:
         {
           "objectId":"0123456789",
           "description":"here will be a description",
@@ -47,6 +47,22 @@ method DELETE:
     
 All tasks that were marked as completed - will be automatically cleaned once a day at 6:00 a.m.
 
-Instructions how to install:
+**Instructions how to use:**
 
-    for instalation the database have to be cleared
+   1. [https://develop.backendless.com][https://develop.backendless.com] - 
+        register on the site;
+   2. [https://backendless.com/docs/android/users_overview.html][https://backendless.com/docs/android/users_overview.html] -
+        create your app using this reference;
+   3. insert your applicationId and apiKey to connection.properties;
+
+   4. open bush and go to the directory where your project is located;
+   
+   5. command to installing: _mvn package_
+      
+   6. command to launching: _java -jar target/todo_app-1.0-SNAPSHOT.jar_
+
+
+
+[https://backendless.com/docs/android/users_overview.html]: https://backendless.com/docs/android/users_overview.html
+
+[https://develop.backendless.com]: https://develop.backendless.com
