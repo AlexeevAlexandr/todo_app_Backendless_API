@@ -18,16 +18,13 @@ public class Schedule {
     // Scheduled at 6:00 a.m. every day
     @Scheduled(cron = "0 0 6 ? * *")
     public void run() {
-        scheduledTask();
+        deleteAllCompletedTasks();
     }
 
-    private void scheduledTask() {
+    private void deleteAllCompletedTasks() {
         log.info("Attempt to delete all completed tasks");
-        try {
-            int count = todoService.deleteCompletedTodo();
-            log.info("Completed tasks have been deleted : " + count);
-        } catch (Exception e){
-            log.warning("Can not delete completed tasks");
-        }
+        int count = todoService.deleteCompletedTodo();
+        log.info("Completed tasks have been deleted : " + count);
+
     }
 }

@@ -95,7 +95,7 @@ public class TodoServiceImpl implements IBackendlessService, TodoService {
                     Backendless.Data.of(TodoEntity.class).remove(entity);
                     log.info("Entity removed");
                 } catch (Exception e) {
-                    log.warning("Can not remove entity " + e.getMessage());
+                    log.warning("Can not remove entity");
                 }
             }
         }
