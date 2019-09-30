@@ -54,12 +54,10 @@ All tasks that were marked as completed - will be automatically cleaned once a d
    2. [https://backendless.com/docs/android/users_overview.html][https://backendless.com/docs/android/users_overview.html] -
         create your app using this reference;
    3. insert your applicationId and apiKey to connection.properties;
-
-   4. open bush and go to the directory where your project is located;
    
-   5. command to installing: _mvn package_
+   4. command to installing: _mvn package_
       
-   6. command to launching: _java -jar target/todo_app-1.0-SNAPSHOT.jar_
+   5. command to launching: _java -jar target/todo_app-1.0-SNAPSHOT.jar_
 
 
 
