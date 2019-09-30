@@ -1,4 +1,4 @@
-package com.sample.api.controller.timer;
+package com.sample.api.timer;
 
 import com.sample.api.service.TodoService;
 import lombok.extern.java.Log;
@@ -15,7 +15,7 @@ public class Schedule {
         this.todoService = todoService;
     }
 
-    // set schedule at 6:00 AM everyday
+    // Scheduled at 6:00 a.m. every day
     @Scheduled(cron = "0 0 6 ? * *")
     public void run() {
         scheduledTask();

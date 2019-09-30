@@ -4,6 +4,7 @@ import com.backendless.Backendless;
 import com.backendless.servercode.IBackendlessService;
 import com.sample.api.entity.TodoEntity;
 import com.sample.api.exception.TodoException;
+import lombok.extern.java.Log;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -12,6 +13,7 @@ import java.util.List;
 import java.util.Properties;
 
 @Service
+@Log
 public class TodoServiceImpl implements IBackendlessService, TodoService {
 
     static{
@@ -28,13 +30,17 @@ public class TodoServiceImpl implements IBackendlessService, TodoService {
 
     @Override
     public TodoEntity save(TodoEntity todoEntity) {
-        return Backendless.Data.of(TodoEntity.class).save(todoEntity);
+        log.info("Attempt to save entity");
+        TodoEntity entity =  Backendless.Data.of(TodoEntity.class).save(todoEntity);
+        log.info("Entity saved successfully: " + entity.toString());
+        return entity;
     }
 
     @Override
     public TodoEntity getById(String id) {
         TodoEntity todoEntity;
         try {
+            log.info("Getting a task by id: " + id);
             todoEntity = Backendless.Data.of(TodoEntity.class).findById(id);
         } catch (Exception e){
             throw new TodoException(e.getMessage());
@@ -44,6 +50,7 @@ public class TodoServiceImpl implements IBackendlessService, TodoService {
 
     @Override
     public List<TodoEntity> getAll() {
+        log.info("Getting all tasks");
         return Backendless.Data.of(TodoEntity.class).find();
     }
 
@@ -51,6 +58,7 @@ public class TodoServiceImpl implements IBackendlessService, TodoService {
     public TodoEntity markAsCompleted(String id) {
         TodoEntity todoEntity = getById(id);
         todoEntity.setCompleted(true);
+        log.info("Mark a task as completed");
         return Backendless.Data.of(TodoEntity.class).save(todoEntity);
     }
 
@@ -61,7 +69,9 @@ public class TodoServiceImpl implements IBackendlessService, TodoService {
         for (TodoEntity entity : entityList) {
             if (entity.isCompleted()){
                 count++;
+                log.info("Attempt to remove entity: " + entity.toString());
                 Backendless.Data.of(TodoEntity.class).remove(entity);
+                log.info("Entity removed");
             }
         }
         return count;

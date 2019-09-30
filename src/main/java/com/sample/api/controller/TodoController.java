@@ -36,6 +36,7 @@ public class TodoController {
 
     @PutMapping(value = "", produces = { MediaType.APPLICATION_JSON_VALUE })
     public TodoEntity update(@RequestBody TodoEntity todoEntity){
+        // check if present TodoEntity
         todoService.getById(todoEntity.getObjectId());
         return todoService.save(todoEntity);
     }
