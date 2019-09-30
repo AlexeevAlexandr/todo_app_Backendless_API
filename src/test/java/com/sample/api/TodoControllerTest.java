@@ -4,36 +4,31 @@ import com.sample.api.controller.TodoController;
 import com.sample.api.entity.TodoEntity;
 import com.sample.api.service.TodoService;
 import com.sample.api.testHelper.TestHelper;
+import io.restassured.module.mockmvc.RestAssuredMockMvc;
 import org.json.simple.JSONObject;
-import org.junit.AfterClass;
+import org.junit.Assert;
 import org.junit.Before;
-import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.junit.runners.MethodSorters;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
-import java.util.List;
-
-import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static io.restassured.module.mockmvc.RestAssuredMockMvc.given;
+import static io.restassured.module.mockmvc.RestAssuredMockMvc.when;
+import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
+import static javax.servlet.http.HttpServletResponse.SC_OK;
+import static org.hamcrest.Matchers.equalTo;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = Main.class)
 @SpringBootTest
-@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class TodoControllerTest {
-    private MockMvc mockMvc;
     @Autowired
     TodoController todoController;
     @Autowired
@@ -45,112 +40,139 @@ public class TodoControllerTest {
 
     @Before
     public final void setup() {
-        this.mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();
-    }
-
-    @AfterClass
-    public static void teardown(){
-        List<TodoEntity> todoEntities = TestHelper.getAll();
-        todoEntities.forEach(e -> TestHelper.delete(e.getObjectId()));
+        MockMvc mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();
+        RestAssuredMockMvc.mockMvc(mockMvc);
     }
 
     @Test
-    public void A_createTest() throws Exception {
+    public void create() throws Exception {
         JSONObject jsonObject = testHelper.getJsonObjectFromFile("json/todoEntity.json");
 
-        mockMvc.perform(MockMvcRequestBuilders.post("/todo")
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .accept(MediaType.APPLICATION_JSON)
-                .characterEncoding("UTF-8")
-                .content(jsonObject.toString()))
-                .andExpect(jsonPath("$.description").value("here will be a description"))
-                .andExpect(jsonPath("$.owner").value("Owner's Name"))
-                .andExpect(jsonPath("$.deadlineDate").value("2020-01-01"))
-                .andDo(print());
+        String id =
+                given().contentType(MediaType.APPLICATION_JSON_VALUE).
+                        body(jsonObject.toString()).
+                        when().
+                        post("/todo").
+                        then().
+                        statusCode(SC_OK).
+                        extract().
+                        path("objectId");
+
+        // delete
+        testHelper.delete(id);
     }
 
     @Test
-    public void B_getAllTest() throws Exception {
+    public void getAll() {
+        when().get("/todo").
+        then().statusCode(SC_OK);
+    }
+
+    @Test
+    public void getById() throws Exception {
         JSONObject jsonObject = testHelper.getJsonObjectFromFile("json/todoEntity.json");
 
-        mockMvc.perform(MockMvcRequestBuilders.post("/todo")
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .accept(MediaType.APPLICATION_JSON)
-                .characterEncoding("UTF-8")
-                .content(jsonObject.toString()))
-                .andDo(print());
+        // create data
+        String id =
+                given().contentType(MediaType.APPLICATION_JSON_VALUE).
+                        body(jsonObject.toString()).
+                        when().
+                        post("/todo").
+                        then().
+                        statusCode(SC_OK).
+                        extract().
+                        path("objectId");
 
-        mockMvc.perform(MockMvcRequestBuilders.get("/todo")
-                .accept(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$", hasSize(2)))
-                .andDo(print());
+        // check created data
+        when().get("/todo/" + id).
+        then().statusCode(SC_OK).body("objectId", equalTo(id));
+
+        // delete
+        testHelper.delete(id);
     }
 
     @Test
-    public void C_getByIdTest() throws Exception {
-        List<TodoEntity> todoEntityList = todoService.getAll();
-        TodoEntity todoEntity = todoEntityList.get(0);
-        String id = todoEntity.getObjectId();
+    public void update() throws Exception {
+        JSONObject jsonObject = testHelper.getJsonObjectFromFile("json/todoEntity.json");
 
-        mockMvc.perform(MockMvcRequestBuilders.get("/todo/" + id)
-                .accept(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.objectId").value(id))
-                .andDo(print());
+        String id =
+                given().contentType(MediaType.APPLICATION_JSON_VALUE).
+                        body(jsonObject.toString()).
+                        when().
+                        post("/todo").
+                        then().
+                        statusCode(SC_OK).
+                        extract().
+                        path("objectId");
+
+        TodoEntity todoEntity_1 = testHelper.getById(id);
+        todoEntity_1.setDescription("new description");
+
+                given().contentType(MediaType.APPLICATION_JSON_VALUE).
+                        body(todoEntity_1.toString()).
+                        when().
+                        put("/todo").
+                        then().statusCode(SC_OK);
+
+        // check created data
+        TodoEntity todoEntity_2 = testHelper.getById(id);
+        Assert.assertEquals(todoEntity_1.getDescription(), todoEntity_2.getDescription());
+
+        // delete
+        testHelper.delete(id);
     }
 
     @Test
-    public void D_updateTest() throws Exception {
-        List<TodoEntity> todoEntityList = todoService.getAll();
-        TodoEntity todoEntity = todoEntityList.get(0);
-        todoEntity.setDescription("updated description");
+    public void markAsCompleted() throws Exception {
+        JSONObject jsonObject = testHelper.getJsonObjectFromFile("json/todoEntity.json");
 
-        mockMvc.perform(MockMvcRequestBuilders.put("/todo")
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .accept(MediaType.APPLICATION_JSON)
-                .characterEncoding("UTF-8")
-                .content(todoEntity.toString()))
-                .andExpect(jsonPath("$.description").value("updated description"))
-                .andDo(print());
+        String id =
+                given().contentType(MediaType.APPLICATION_JSON_VALUE).
+                        body(jsonObject.toString()).
+                        when().
+                        post("/todo").
+                        then().
+                        statusCode(SC_OK).
+                        extract().
+                        path("objectId");
+
+        given().contentType(MediaType.APPLICATION_JSON_VALUE).
+                when().
+                delete("/todo/{id}",id);
+
+        // check created data
+        TodoEntity todoEntity = testHelper.getById(id);
+        Assert.assertTrue(todoEntity.isCompleted());
+
+        // delete
+        testHelper.delete(id);
     }
 
     @Test
-    public void E_markAsCompletedTest() throws Exception {
-        List<TodoEntity> todoEntityList = todoService.getAll();
-        TodoEntity todoEntity = todoEntityList.get(0);
-        String id = todoEntity.getObjectId();
-
-        mockMvc.perform(MockMvcRequestBuilders.delete("/todo/" + id)
-                .accept(MediaType.APPLICATION_JSON)
-                .characterEncoding("UTF-8"))
-                .andExpect(jsonPath("$.completed").value(true))
-                .andDo(print());
+    public void getById_False() {
+        when().get("/todo/0123456789").
+                then().statusCode(SC_NOT_FOUND);
     }
 
     @Test
-    public void F_getByIdFalseTest() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.get("/todo/0123456789"))
-                .andExpect(MockMvcResultMatchers.status().isNotFound())
-                .andDo(print());
-    }
-
-    @Test
-    public void G_updateFalseTest() throws Exception {
+    public void update_False() {
         TodoEntity todoEntity = new TodoEntity();
         todoEntity.setObjectId("0123456789");
 
-        mockMvc.perform(MockMvcRequestBuilders.put("/todo")
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .accept(MediaType.APPLICATION_JSON)
-                .characterEncoding("UTF-8")
-                .content(todoEntity.toString()))
-                .andExpect(MockMvcResultMatchers.status().isNotFound())
-                .andDo(print());
+        given().contentType(MediaType.APPLICATION_JSON_VALUE).
+                body(todoEntity.toString()).
+                when().
+                put("/todo").
+                then().
+                statusCode(SC_NOT_FOUND);
     }
 
     @Test
-    public void G_markAsCompletedFalseTest() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.delete("/todo/0123456789"))
-                .andExpect(MockMvcResultMatchers.status().isNotFound())
-                .andDo(print());
+    public void markAsCompleted_False() {
+        given().contentType(MediaType.APPLICATION_JSON_VALUE).
+                when().
+                delete("/todo/0123456789").
+                then().
+                statusCode(SC_NOT_FOUND);
     }
 }

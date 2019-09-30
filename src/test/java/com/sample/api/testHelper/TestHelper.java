@@ -10,7 +10,6 @@ import org.springframework.stereotype.Component;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.List;
 import java.util.Objects;
 
 @Component
@@ -25,16 +24,11 @@ public class TestHelper {
         return new File(Objects.requireNonNull(getClass().getClassLoader().getResource(path)).getFile());
     }
 
-    public static List<TodoEntity> getAll() {
-        return Backendless.Data.of(TodoEntity.class).find();
-    }
-
-
-    private static TodoEntity getById(String id) {
+    public TodoEntity getById(String id) {
         return Backendless.Data.of(TodoEntity.class).findById(id);
     }
 
-    public static void delete(String id) {
+    public void delete(String id) {
         TodoEntity todoEntity = getById(id);
         Backendless.Data.of(TodoEntity.class).remove(todoEntity);
     }
