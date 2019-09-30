@@ -55,12 +55,15 @@ public class TodoServiceImpl implements IBackendlessService, TodoService {
     }
 
     @Override
-    public void deleteCompletedTodo() {
+    public int deleteCompletedTodo() {
+        int count = 0;
         List<TodoEntity> entityList = getAll();
         for (TodoEntity entity : entityList) {
             if (entity.isCompleted()){
+                count++;
                 Backendless.Data.of(TodoEntity.class).remove(entity);
             }
         }
+        return count;
     }
 }
