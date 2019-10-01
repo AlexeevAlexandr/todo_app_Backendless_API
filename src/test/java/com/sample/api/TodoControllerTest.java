@@ -63,6 +63,18 @@ public class TodoControllerTest {
     }
 
     @Test
+    public void createFalse() throws Exception {
+        JSONObject jsonObject = testHelper.getJsonObjectFromFile("json/brokenTodoEntity.json");
+
+        given().contentType(MediaType.APPLICATION_JSON_VALUE).
+                body(jsonObject.toString()).
+                when().
+                post("/todo").
+                then().
+                statusCode(SC_NOT_FOUND);
+    }
+
+    @Test
     public void getAll() {
         when().get("/todo").
         then().statusCode(SC_OK);
@@ -84,11 +96,17 @@ public class TodoControllerTest {
                         path("objectId");
 
         // check created data
-        when().get("/todo/" + id).
-        then().statusCode(SC_OK).body("objectId", equalTo(id));
+                when().get("/todo/" + id).
+                then().statusCode(SC_OK).body("objectId", equalTo(id));
 
         // delete
         testHelper.delete(id);
+    }
+
+    @Test
+    public void getByIdFalse() {
+        when().get("/todo/0123456789").
+                then().statusCode(SC_NOT_FOUND);
     }
 
     @Test
@@ -123,6 +141,19 @@ public class TodoControllerTest {
     }
 
     @Test
+    public void updateFalse() {
+        TodoEntity todoEntity = new TodoEntity();
+        todoEntity.setObjectId("0123456789");
+
+        given().contentType(MediaType.APPLICATION_JSON_VALUE).
+                body(todoEntity.toString()).
+                when().
+                put("/todo").
+                then().
+                statusCode(SC_NOT_FOUND);
+    }
+
+    @Test
     public void markAsCompleted() throws Exception {
         JSONObject jsonObject = testHelper.getJsonObjectFromFile("json/todoEntity.json");
 
@@ -146,25 +177,6 @@ public class TodoControllerTest {
 
         // delete
         testHelper.delete(id);
-    }
-
-    @Test
-    public void getById_False() {
-        when().get("/todo/0123456789").
-                then().statusCode(SC_NOT_FOUND);
-    }
-
-    @Test
-    public void update_False() {
-        TodoEntity todoEntity = new TodoEntity();
-        todoEntity.setObjectId("0123456789");
-
-        given().contentType(MediaType.APPLICATION_JSON_VALUE).
-                body(todoEntity.toString()).
-                when().
-                put("/todo").
-                then().
-                statusCode(SC_NOT_FOUND);
     }
 
     @Test

@@ -9,7 +9,6 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
@@ -19,10 +18,12 @@ public class TodoServiceImpl implements IBackendlessService, TodoService {
 
     static{
         Properties properties = new Properties();
-        try (InputStream input = TodoServiceImpl.class.getClassLoader().getResourceAsStream("connection.properties")){
-          properties.load(input);
+        try (InputStream input = TodoServiceImpl.class.getClassLoader().getResourceAsStream("connection.properties")) {
+            log.info("Attempt to load properties");
+            properties.load(input);
+            log.info("Properties loaded");
         } catch (IOException e) {
-          e.printStackTrace();
+            log.warning("Can not load properties \n" + e.getMessage());
         }
         String applicationId = properties.getProperty("applicationId");
         String apiKey = properties.getProperty("apiKey");
@@ -31,13 +32,14 @@ public class TodoServiceImpl implements IBackendlessService, TodoService {
 
     @Override
     public TodoEntity save(TodoEntity todoEntity) {
-        TodoEntity entity = new TodoEntity();
+        TodoEntity entity;
         try {
             log.info("Attempt to save entity");
             entity =  Backendless.Data.of(TodoEntity.class).save(todoEntity);
             log.info("Entity saved successfully: " + entity.toString());
         } catch (Exception e){
             log.warning("Can not save entity");
+            throw new TodoException(e.getMessage());
         }
         return entity;
     }
@@ -46,8 +48,9 @@ public class TodoServiceImpl implements IBackendlessService, TodoService {
     public TodoEntity getById(String id) {
         TodoEntity todoEntity;
         try {
-            log.info("Getting a task by id: " + id);
+            log.info("Getting entity by id: " + id);
             todoEntity = Backendless.Data.of(TodoEntity.class).findById(id);
+            log.info("Found entity: " + todoEntity.toString());
         } catch (Exception e){
             log.info(String.format("Id '%s' not found", id));
             throw new TodoException(e.getMessage());
@@ -57,34 +60,37 @@ public class TodoServiceImpl implements IBackendlessService, TodoService {
 
     @Override
     public List<TodoEntity> getAll() {
-        List<TodoEntity> todoEntities = new ArrayList<>();
+        List<TodoEntity> todoEntities;
         try {
-            log.info("Getting all tasks");
+            log.info("Getting all entities");
             todoEntities = Backendless.Data.of(TodoEntity.class).find();
-            log.info("Getting all tasks successfully");
+            log.info("Getting all entities successfully");
         } catch (Exception e){
-            log.warning("Can not get all tasks");
+            log.warning("Can not get all entities");
+            throw new TodoException(e.getMessage());
         }
         return todoEntities;
     }
 
     @Override
     public TodoEntity markAsCompleted(String id) {
+        log.info("Attempt to mark entity as completed");
         TodoEntity todoEntity = getById(id);
         todoEntity.setCompleted(true);
-        TodoEntity entity = new TodoEntity();
+        TodoEntity entity;
         try {
-            log.info("Attempt to mark task as completed");
             entity = Backendless.Data.of(TodoEntity.class).save(todoEntity);
-            log.info("Task marked as completed");
+            log.info("Entity marked as completed");
         } catch (Exception e) {
-            log.warning("Can not mark task as completed");
+            log.warning("Can not mark entity as completed");
+            throw new TodoException(e.getMessage());
         }
         return entity;
     }
 
     @Override
     public int deleteCompletedTodo() {
+        log.info("Attempt to remove completed entities");
         int count = 0;
         List<TodoEntity> entityList = getAll();
         for (TodoEntity entity : entityList) {
@@ -96,6 +102,7 @@ public class TodoServiceImpl implements IBackendlessService, TodoService {
                     log.info("Entity removed");
                 } catch (Exception e) {
                     log.warning("Can not remove entity");
+                    throw new TodoException(e.getMessage());
                 }
             }
         }

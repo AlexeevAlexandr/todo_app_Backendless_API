@@ -55,9 +55,9 @@ All tasks that were marked as completed - will be automatically cleaned once a d
         create your app using this reference;
    3. insert your applicationId and apiKey to connection.properties;
    
-   4. command to installing: _mvn package_
+   4. to installing: _mvn package_
       
-   5. command to launching: _java -jar target/todo_app-1.0-SNAPSHOT.jar_
+   5. to launching: _java -jar target/todo_app-1.0-SNAPSHOT.jar_
 
 
 
