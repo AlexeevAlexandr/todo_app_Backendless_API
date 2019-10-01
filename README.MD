@@ -49,18 +49,11 @@ All tasks that were marked as completed - will be automatically cleaned once a d
 
 **Instructions how to use:**
 
-   1. [https://develop.backendless.com][https://develop.backendless.com] - 
-        register on the site;
-   2. [https://backendless.com/docs/android/users_overview.html][https://backendless.com/docs/android/users_overview.html] -
+   1. https://develop.backendless.com - register on the site;
+   2. https://backendless.com/docs/android/users_overview.html -
         create your app using this reference;
    3. insert your applicationId and apiKey to connection.properties;
    
    4. to installing: _mvn package_
       
    5. to launching: _java -jar target/todo_app-1.0-SNAPSHOT.jar_
-
-
-
-[https://backendless.com/docs/android/users_overview.html]: https://backendless.com/docs/android/users_overview.html
-
-[https://develop.backendless.com]: https://develop.backendless.com
