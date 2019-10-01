@@ -49,7 +49,7 @@ public class TodoServiceImpl implements IBackendlessService, TodoService {
             todoEntities = Backendless.Data.of(TodoEntity.class).find();
             log.info("Getting all entities successfully");
         } catch (Exception e){
-            log.warning("Can not get all entities");
+            log.warning("Can not get all entities: " + e.getMessage());
             throw new TodoException(e.getMessage());
         }
         return todoEntities;
@@ -65,7 +65,7 @@ public class TodoServiceImpl implements IBackendlessService, TodoService {
             entity = Backendless.Data.of(TodoEntity.class).save(todoEntity);
             log.info("Entity marked as completed");
         } catch (Exception e) {
-            log.warning("Can not mark entity as completed");
+            log.warning("Can not mark entity as completed: " + e.getMessage());
             throw new TodoException(e.getMessage());
         }
         return entity;
@@ -84,7 +84,7 @@ public class TodoServiceImpl implements IBackendlessService, TodoService {
                     Backendless.Data.of(TodoEntity.class).remove(entity);
                     log.info("Entity removed");
                 } catch (Exception e) {
-                    log.warning("Can not remove entity");
+                    log.warning("Can not remove entity: " + e.getMessage());
                     throw new TodoException(e.getMessage());
                 }
             }

@@ -34,14 +34,13 @@ public class TodoController {
 
     @PostMapping(value = "", produces = { MediaType.APPLICATION_JSON_VALUE })
     public TodoEntity create(@RequestBody TodoEntity todoEntity){
+        todoValidator.isValidEntity(todoEntity);
         return todoService.save(todoEntity);
     }
 
     @PutMapping(value = "", produces = { MediaType.APPLICATION_JSON_VALUE })
     public TodoEntity update(@RequestBody TodoEntity todoEntity){
-        todoValidator.isValidDate(todoEntity);
-        // check if present TodoEntity
-        todoService.getById(todoEntity.getObjectId());
+        todoValidator.isValidEntity(todoEntity);
         return todoService.save(todoEntity);
     }
 

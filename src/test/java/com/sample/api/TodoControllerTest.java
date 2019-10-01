@@ -63,8 +63,65 @@ public class TodoControllerTest {
     }
 
     @Test
-    public void createFalse() throws Exception {
+    public void createWithBrokenData() throws Exception {
         JSONObject jsonObject = testHelper.getJsonObjectFromFile("json/brokenTodoEntity.json");
+
+        given().contentType(MediaType.APPLICATION_JSON_VALUE).
+                body(jsonObject.toString()).
+                when().
+                post("/todo").
+                then().
+                statusCode(SC_NOT_FOUND);
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    public void createWithEmptyDescription() throws Exception {
+        JSONObject jsonObject = testHelper.getJsonObjectFromFile("json/todoEntity.json");
+        jsonObject.put("description", "");
+
+        given().contentType(MediaType.APPLICATION_JSON_VALUE).
+                body(jsonObject.toString()).
+                when().
+                post("/todo").
+                then().
+                statusCode(SC_NOT_FOUND);
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    public void createWithEmptyOwner() throws Exception {
+        JSONObject jsonObject = testHelper.getJsonObjectFromFile("json/todoEntity.json");
+        jsonObject.put("owner", "");
+
+        given().contentType(MediaType.APPLICATION_JSON_VALUE).
+                body(jsonObject.toString()).
+                when().
+                post("/todo").
+                then().
+                statusCode(SC_NOT_FOUND);
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    public void createWithEmptyDeadlineDate() throws Exception {
+        JSONObject jsonObject = testHelper.getJsonObjectFromFile("json/todoEntity.json");
+        jsonObject.put("deadlineDate", "");
+
+        given().contentType(MediaType.APPLICATION_JSON_VALUE).
+                body(jsonObject.toString()).
+                when().
+                post("/todo").
+                then().
+                statusCode(SC_NOT_FOUND);
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    public void createNotValidDate() throws Exception {
+        JSONObject jsonObject = testHelper.getJsonObjectFromFile("json/todoEntity.json");
+        jsonObject.put("deadlineDate", "2000-02-30");
+
 
         given().contentType(MediaType.APPLICATION_JSON_VALUE).
                 body(jsonObject.toString()).
@@ -104,7 +161,7 @@ public class TodoControllerTest {
     }
 
     @Test
-    public void getByIdFalse() {
+    public void getByWrongId() {
         when().get("/todo/0123456789").
                 then().statusCode(SC_NOT_FOUND);
     }
@@ -141,8 +198,32 @@ public class TodoControllerTest {
     }
 
     @Test
+    public void updateNotValidDate() throws Exception {
+        JSONObject jsonObject = testHelper.getJsonObjectFromFile("json/todoEntity.json");
+
+        String id =
+                given().contentType(MediaType.APPLICATION_JSON_VALUE).
+                        body(jsonObject.toString()).
+                        when().
+                        post("/todo").
+                        then().
+                        statusCode(SC_OK).
+                        extract().
+                        path("objectId");
+
+        TodoEntity todoEntity_1 = testHelper.getById(id);
+        todoEntity_1.setDeadlineDate("2000-02-30");
+
+        given().contentType(MediaType.APPLICATION_JSON_VALUE).
+                body(todoEntity_1.toString()).
+                when().
+                put("/todo").
+                then().statusCode(SC_NOT_FOUND);
+    }
+
+    @Test
     public void updateFalse() throws Exception {
-        JSONObject jsonObject = testHelper.getJsonObjectFromFile("json/wrongIdTodoEntity.json");
+        JSONObject jsonObject = testHelper.getJsonObjectFromFile("json/todoEntityWithWrongId.json");
 
         given().contentType(MediaType.APPLICATION_JSON_VALUE).
                 body(jsonObject.toString()).
