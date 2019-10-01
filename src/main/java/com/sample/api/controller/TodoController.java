@@ -2,6 +2,7 @@ package com.sample.api.controller;
 
 import com.sample.api.entity.TodoEntity;
 import com.sample.api.service.TodoService;
+import com.sample.api.validator.TodoValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
@@ -13,10 +14,12 @@ import java.util.List;
 public class TodoController {
 
     private final TodoService todoService;
+    private final TodoValidator todoValidator;
 
     @Autowired
-    public TodoController(TodoService todoService) {
+    public TodoController(TodoService todoService, TodoValidator todoValidator) {
         this.todoService = todoService;
+        this.todoValidator = todoValidator;
     }
 
     @GetMapping(value = "", produces = { MediaType.APPLICATION_JSON_VALUE })
@@ -36,6 +39,7 @@ public class TodoController {
 
     @PutMapping(value = "", produces = { MediaType.APPLICATION_JSON_VALUE })
     public TodoEntity update(@RequestBody TodoEntity todoEntity){
+        todoValidator.isValidDate(todoEntity);
         // check if present TodoEntity
         todoService.getById(todoEntity.getObjectId());
         return todoService.save(todoEntity);
