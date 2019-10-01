@@ -141,12 +141,11 @@ public class TodoControllerTest {
     }
 
     @Test
-    public void updateFalse() {
-        TodoEntity todoEntity = new TodoEntity();
-        todoEntity.setObjectId("0123456789");
+    public void updateFalse() throws Exception {
+        JSONObject jsonObject = testHelper.getJsonObjectFromFile("json/wrongIdTodoEntity.json");
 
         given().contentType(MediaType.APPLICATION_JSON_VALUE).
-                body(todoEntity.toString()).
+                body(jsonObject.toString()).
                 when().
                 put("/todo").
                 then().

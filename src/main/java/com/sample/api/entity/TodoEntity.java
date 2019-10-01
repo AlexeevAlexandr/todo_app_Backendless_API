@@ -10,25 +10,25 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 public class TodoEntity {
-  private String objectId;
-  @NonNull
-  private String description;
-  @NonNull
-  private String owner;
-  @NonNull
-  private boolean completed;
-  @NonNull
-  private String deadlineDate;
+    private String objectId;
+    @NonNull
+    private String description;
+    @NonNull
+    private String owner;
+    @NonNull
+    private boolean completed;
+    @NonNull
+    private String deadlineDate;
 
-  @Override
-  public String toString() {
-    return "{" +
+    @Override
+    public String toString() {
+        return "{" +
             "\"objectId\" : \"" + objectId + "\", " +
             "\"description\" : \"" + description + "\", " +
             "\"owner\" : \"" + owner + "\"," +
             "\"completed\" : \"" + completed + "\"," +
             "\"deadlineDate\" : \"" + deadlineDate + "\"" +
             "}";
-  }
+    }
 }
                            

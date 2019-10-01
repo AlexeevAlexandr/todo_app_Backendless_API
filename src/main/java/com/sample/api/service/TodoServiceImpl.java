@@ -7,28 +7,11 @@ import com.sample.api.exception.TodoException;
 import lombok.extern.java.Log;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.List;
-import java.util.Properties;
 
 @Service
 @Log
 public class TodoServiceImpl implements IBackendlessService, TodoService {
-
-    static{
-        Properties properties = new Properties();
-        try (InputStream input = TodoServiceImpl.class.getClassLoader().getResourceAsStream("connection.properties")) {
-            log.info("Attempt to load properties");
-            properties.load(input);
-            log.info("Properties loaded");
-        } catch (IOException e) {
-            log.warning("Can not load properties \n" + e.getMessage());
-        }
-        String applicationId = properties.getProperty("applicationId");
-        String apiKey = properties.getProperty("apiKey");
-        Backendless.initApp(applicationId, apiKey);
-    }
 
     @Override
     public TodoEntity save(TodoEntity todoEntity) {
@@ -38,7 +21,7 @@ public class TodoServiceImpl implements IBackendlessService, TodoService {
             entity =  Backendless.Data.of(TodoEntity.class).save(todoEntity);
             log.info("Entity saved successfully: " + entity.toString());
         } catch (Exception e){
-            log.warning("Can not save entity");
+            log.warning("Can not save entity\n" + e.getMessage());
             throw new TodoException(e.getMessage());
         }
         return entity;
